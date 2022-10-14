@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const auth = require('../middlewares/authMiddleware')
 const Cryptr = require('cryptr')
-const cryptr  = new Cryptr(process.env.CRYPT_KEY);
+const cryptr  = new Cryptr(process.env.CRYPT_KEY);    
 require("dotenv").config()
 
 
@@ -13,7 +13,7 @@ var SiteController = class SiteController{
     static addSite = async(req, res) =>{
         
         const {url, sitename, sector, username, sitepassword, notes} = req.body
-        const encryptedString = cryptr.encrypt(sitepassword);
+        const encryptedString = cryptr.encrypt(sitepassword); //encrypts data using cryptr with a secret key
         const newSite = new siteModel({
             url : url,
             sitename : sitename,
@@ -32,7 +32,7 @@ var SiteController = class SiteController{
         }
     }
 
-    // To view  all the sites
+    // To view  all the sites 
     static getAllSite = async (req, res) =>{
         try {
             const response = await siteModel.find()
@@ -95,20 +95,17 @@ var SiteController = class SiteController{
 
     // To copy the password 
     static decryptPassword = async (req, res)=>{
+
         const {url} = req.body
         try{
             const response = await siteModel.find({url})
-            res.send(cryptr.decrypt(response[0].sitepassword))
+            res.send(cryptr.decrypt(response[0].sitepassword))  // decrypts password
             
         }catch(error){
             console.log(error)
             res.send({ "status": "failed", "message": "Something went wrong" })
         }
     }
-
-    
     }
-
-    
 
 module.exports = SiteController
