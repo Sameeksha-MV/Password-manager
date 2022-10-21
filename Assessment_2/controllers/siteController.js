@@ -21,7 +21,7 @@ var SiteController = class SiteController{
             username : username,
             sitepassword : encryptedString,
             notes : notes,
-            userId:req.userId
+            userId:req.user
         })
         try{
             await newSite.save()
@@ -35,7 +35,7 @@ var SiteController = class SiteController{
     // To view  all the sites 
     static getAllSite = async (req, res) =>{
         try {
-            const response = await siteModel.find()
+            const response = await siteModel.find({userId:req.user})
             res.send(response)
         }catch(error){
             console.log(error)
@@ -56,22 +56,21 @@ var SiteController = class SiteController{
     static updateSiteById = async (req, res) =>{
         try{
             const response = await siteModel.findByIdAndUpdate(req.params.id, req.body)
-            res.send(response)
+            res.send({"status": "success", "message":"Updated successfully"})
         }catch(error){
-            console.log(error)
+            res.send({"status":"failed", "message": " Something went wrong"})
         }
     }
 
     // To delete the site
-    // static deleteSiteById = async (req, res) =>{
-    //     try{
-    //         const response = await siteModel.findByIdAndDelete(req.params.id)
-    //         res.send(response)
-    //     }catch(error){
-    //         console.log(error)
-    //     }
-    // }
-
+    static deleteSiteById = async (req, res) =>{
+        try{
+            const response = await siteModel.findByIdAndDelete(req.params.id)
+            res.send({"status": "success", "message":"Deleted successfully"})
+        }catch(error){
+            res.send({"status":"failed", "message": " Something went wrong"})
+        }
+    }
 
     // To search the sites
 
@@ -88,24 +87,23 @@ var SiteController = class SiteController{
             })
             res.send(results)
         }catch(error){
-            console.log(error)
             res.status(400).send({ "status": "failed" , "message": "Failed to search"})
         }
     }
 
     // To copy the password 
-    static decryptPassword = async (req, res)=>{
+    // static decryptPassword = async (req, res)=>{
 
-        const {url} = req.body
-        try{
-            const response = await siteModel.find({url})
-            res.send(cryptr.decrypt(response[0].sitepassword))  // decrypts password
+    //     const {url} = req.body
+    //     try{
+    //         const response = await siteModel.find({url})
+    //         res.send(cryptr.decrypt(response[0].sitepassword))  // decrypts password
             
-        }catch(error){
-            console.log(error)
-            res.send({ "status": "failed", "message": "Something went wrong" })
-        }
-    }
+    //     }catch(error){
+    //         console.log(error)
+    //         res.send({ "status": "failed", "message": "Something went wrong" })
+    //     }
+    // }
     }
 
 module.exports = SiteController

@@ -10,8 +10,8 @@ router.post('/addsite',checkUserAuth, addSite)
 router.get('/getallsites',checkUserAuth, getAllSite)
 router.get('/:id',checkUserAuth, getSingleSite)
 router.put('/:id',checkUserAuth, updateSiteById)
-// router.get('/:id',checkUserAuth, deleteSiteById)
+router.delete('/:id',checkUserAuth, deleteSiteById)
 router.get('/',checkUserAuth, searchSite)
-router.get('/decryptpassword',checkUserAuth, decryptPassword)
+// router.get('/decryptpassword',checkUserAuth, decryptPassword)
 
 module.exports = router

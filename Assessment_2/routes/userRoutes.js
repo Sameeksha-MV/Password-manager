@@ -14,6 +14,7 @@ router.post('/signin', userSignIn)
 
 // Protected routes using middleware
 router.get('/signedInUser',checkUserAuth, loggedUser)
+
 // router.use('/changepassword', checkUserAuth, changeUserPassword)
 
 

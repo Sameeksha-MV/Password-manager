@@ -10,7 +10,7 @@ var UserController = class UserController{
         const {mobNumber, mPin, mPinConfirmation} = req.body
         const user = await userModel.findOne({mobNumber : mobNumber})
         if(user){
-            res.send({"status" : "Failed", "mesaage" : "Mobile number alredy exists"})
+            res.send({"status" : "Failed", "message" : "Mobile number alredy exists"})
         }else{
             if(mobNumber && mPin && mPinConfirmation){
                 if(mPin === mPinConfirmation){
@@ -24,10 +24,10 @@ var UserController = class UserController{
                     await newUser.save()
                     const saved_user = await userModel.findOne({mobNumber : mobNumber})
 
-                    // Generate JWT Token
+                    // // Generate JWT Token
 
-                    const token = jwt.sign({userID:saved_user._id}, process.env.JWT_SECRET_KEY, {expiresIn: '5d'})
-                    res.status(200).send({"status": "success", "message":"You are done!!! You can Sign In to access the vault", "token" : token})
+                    // const token = jwt.sign({userID:saved_user._id}, process.env.JWT_SECRET_KEY, {expiresIn: '1h'})
+                    // res.status(200).send({"status": "success", "message":"You are done!!! You can Sign In to access the vault"})
 
                    }catch (error) {
                         console.log(error)
@@ -38,7 +38,7 @@ var UserController = class UserController{
                     res.send({"status":"failed", "message": "MPin and confirm Mpin doesn't match"})
                 }
             }else{
-                res.send({"status" : "Failed", "mesaage" : "All fields are required"})
+                res.send({"status" : "Failed", "message" : "All fields are required"})
             }
         }
     }
@@ -55,7 +55,7 @@ var UserController = class UserController{
 
                         // Generate JWT token
 
-                        const token = jwt.sign({userID:user._id}, process.env.JWT_SECRET_KEY, {expiresIn: '5d'})
+                        const token = jwt.sign({userID:user._id}, process.env.JWT_SECRET_KEY, {expiresIn: '1h'})
 
                         res.status(200).send({"status": "success", "message":"Sign In successful!!!", "token" : token})
                     }else{
@@ -119,6 +119,8 @@ var UserController = class UserController{
     //       });
     //   }
 
+    
+ 
 
 
 }

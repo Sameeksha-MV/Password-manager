@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 const userModel = require('../models/User')
+const siteModel = require('../models/Site')
 
 var checkUserAuth = async(req, res, next) =>{
     let token 
@@ -18,7 +19,7 @@ var checkUserAuth = async(req, res, next) =>{
             req.user = await userModel.findById(userID).select('-mPin')
             next()
         }catch{
-            console.log(error)
+            
             res.status(401).send({"status": "failed", "message" : "Unauthorized user"})
 
         }
