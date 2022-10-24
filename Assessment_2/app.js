@@ -19,6 +19,8 @@ dbConnect(DB_URL)
 //JSON
 app.use(express.json())
 
+// app.put("/api/user", userRoutes)
+
 //Load Routes
 app.use("/api/user", userRoutes)
 app.use("/api/site", siteRoutes)

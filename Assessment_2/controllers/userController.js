@@ -56,6 +56,7 @@ var UserController = class UserController{
                         // Generate JWT token
 
                         const token = jwt.sign({userID:user._id}, process.env.JWT_SECRET_KEY, {expiresIn: '1h'})
+                        
 
                         res.status(200).send({"status": "success", "message":"Sign In successful!!!", "token" : token})
                     }else{
@@ -77,6 +78,20 @@ var UserController = class UserController{
         res.send({"user":req.user })
     }
 
+    static logOut = async(req, res) => {
+        const authHeader = req.headers["authorization"];
+        jwt.sign(authHeader, "", (logout, err) => {
+        if (logout) {
+        res.send({msg : 'You have been Logged Out' });
+        } else {
+        res.send({msg:'Error'});
+        }
+        });
+    }
+
+   
+
+        
     // static changeUserPassword = async (req, res) => {
     //     const { mPin, mPinConfirmation } = req.body
     //     if (mPin && mPinConfirmation) {

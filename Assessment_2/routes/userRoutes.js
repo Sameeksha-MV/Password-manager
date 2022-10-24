@@ -1,6 +1,6 @@
 const express = require ('express')
 const { default: mongoose } = require('mongoose')
-const { userSignUp, userSignIn, loggedUser, changeUserPassword } = require('../controllers/userController')
+const { userSignUp, userSignIn, loggedUser, changeUserPassword, logOut } = require('../controllers/userController')
 const userController = require('../controllers/userController')
 const router = express.Router()
 const route = require('../controllers/userController')
@@ -14,6 +14,8 @@ router.post('/signin', userSignIn)
 
 // Protected routes using middleware
 router.get('/signedInUser',checkUserAuth, loggedUser)
+
+router.delete('/logout',checkUserAuth, logOut)
 
 // router.use('/changepassword', checkUserAuth, changeUserPassword)
 
