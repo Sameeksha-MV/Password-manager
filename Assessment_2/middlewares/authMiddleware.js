@@ -9,24 +9,21 @@ var checkUserAuth = async(req, res, next) =>{
         try{
             //Get token from header
             token = authorization.split(' ')[1]
-            // console.log('token', token)
-            // console.log('authorization', authorization)
 
             // Verify Token
-            const {userID} = jwt.verify(token, process.env.JWT_SECRET_KEY)
-
-            // Get user from token
-            req.user = await userModel.findById(userID).select('-mPin')
-            next()
+            const user = jwt.verify(token.toString(), process.env.JWT_SECRET_KEY.toString())
+            req.user=user
+            // console.log(user)
+           
         }catch{
-            
             res.status(401).send({"status": "failed", "message" : "Unauthorized user"})
-
         }
     }
     if(!token){
         res.status(401).send({"status" : "failed", "message" : "Unauthorized User, No token"})
     }
+    next()
 }
+
 
 module.exports = checkUserAuth

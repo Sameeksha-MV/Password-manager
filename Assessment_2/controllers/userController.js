@@ -1,6 +1,7 @@
 const userModel = require('../models/User')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const generateTokens = require("../utils/generateTokens");
 // const messagebird = require('messagebird')('process.env.MESSAGEBIRD_API_KEY');
 
 var UserController = class UserController{
@@ -27,7 +28,7 @@ var UserController = class UserController{
                     // // Generate JWT Token
 
                     // const token = jwt.sign({userID:saved_user._id}, process.env.JWT_SECRET_KEY, {expiresIn: '1h'})
-                    // res.status(200).send({"status": "success", "message":"You are done!!! You can Sign In to access the vault"})
+                    res.status(200).send({"status": "success", "message":"You are done!!! You can Sign In to access the vault"})
 
                    }catch (error) {
                         console.log(error)
@@ -55,7 +56,8 @@ var UserController = class UserController{
 
                         // Generate JWT token
 
-                        const token = jwt.sign({userID:user._id}, process.env.JWT_SECRET_KEY, {expiresIn: '1h'})
+                        // const token = jwt.sign({userID:user._id}, process.env.JWT_SECRET_KEY, {expiresIn: '1h'})
+                        const token =await generateTokens(user)
                         
 
                         res.status(200).send({"status": "success", "message":"Sign In successful!!!", "token" : token})
@@ -73,25 +75,7 @@ var UserController = class UserController{
 
         }
     }
-
-    static loggedUser = async(req, res)=>{
-        res.send({"user":req.user })
-    }
-
-    static logOut = async(req, res) => {
-        const authHeader = req.headers["authorization"];
-        jwt.sign(authHeader, "", (logout, err) => {
-        if (logout) {
-        res.send({msg : 'You have been Logged Out' });
-        } else {
-        res.send({msg:'Error'});
-        }
-        });
-    }
-
-   
-
-        
+      
     // static changeUserPassword = async (req, res) => {
     //     const { mPin, mPinConfirmation } = req.body
     //     if (mPin && mPinConfirmation) {

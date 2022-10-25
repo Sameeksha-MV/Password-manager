@@ -16,7 +16,7 @@ const siteSchema = new mongoose.Schema({
     },
     sector:{
         type : String,
-        enum:["Social Media", "Payment ", "Entertainment", ],
+        // enum:["Social Media", "Payment ", "Entertainment", ],
         required : true
     },
     username:{
@@ -29,12 +29,8 @@ const siteSchema = new mongoose.Schema({
     },
     notes : {
         type : String
-    },
-    userId : {
-        type : mongoose.Schema.Types.ObjectId, 
-        ref : "user"
-
     }
 })
+siteSchema.index({'$**': 'text'}) 
 
 module.exports = mongoose.model("sites",siteSchema)
