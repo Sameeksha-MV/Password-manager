@@ -1,6 +1,7 @@
 const userModel = require('../models/User')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const speakeasy = require('speakeasy')
 const generateTokens = require("../utils/generateTokens");
 // const messagebird = require('messagebird')('process.env.MESSAGEBIRD_API_KEY');
 
@@ -16,7 +17,7 @@ var UserController = class UserController{
             if(mobNumber && mPin && mPinConfirmation){
                 if(mPin === mPinConfirmation){
                    try{
-                    const salt = await bcrypt.genSalt(10)
+                    const salt = await bcrypt.genSalt(Number(process.env.SALT))
                     const hashMpin = await bcrypt.hash(mPin, salt)
                     const newUser = new userModel({
                         mobNumber : mobNumber,
@@ -75,50 +76,70 @@ var UserController = class UserController{
 
         }
     }
-      
-    // static changeUserPassword = async (req, res) => {
-    //     const { mPin, mPinConfirmation } = req.body
-    //     if (mPin && mPinConfirmation) {
-    //       if (mPin !== mPinConfirmation) {
-    //         res.send({ "status": "failed", "message": "New Mpin and Confirm MPin doesn't match" })
-    //       } else {
-    //         const salt = await bcrypt.genSalt(10)
-    //         const newHashPassword = await bcrypt.hash(mPin, salt)
-    //         const result = await userModel.findByIdAndUpdate(req.user._id, { $set: { mPin: newHashPassword } })
-    //         res.send(result)
-    //         res.send({ "status": "success", "message": "Password changed succesfully" })
-    //       }
-    //     } else {
-    //       res.send({ "status": "failed", "message": "All Fields are Required" })
-    //     }
-    //   }
-    
+  
+    static generateOtp = async (req, res) =>{
+        try {
+         const secret = speakeasy.generateSecret({length: 10})
+       res.send({
+         "token": speakeasy.totp({ //Time-based one-time password
+             secret: secret.base32,
+             encoding: "base32",
+             step: 60
+         }),
+         "secret":secret.base32,
+         // "secretData":secret
+       })
+        } catch (error) {
+         res.send(error)
+       
+        } 
+    }
 
-    // forgot password
+    // Change mpin after signin
 
-    // static sendOtp =  async(req, res)=>{
-    //     const { mobNumber } = req.body
-    //     const newMobNumber = "+91" + mobNumber
-    //     var params = {
-    //       template: 'Your Login OTP is %token',
-    //       timeout: 300
-    //     };
+    static resetMPin = async (req, res) => {
+        try {
+            const user = await userModel.findOne({ mobNumber: req.user.mobNumber });
+            const result = await bcrypt.compare(
+                req.body.mPin.toString(),
+                user.mPin
+            );
     
-    //     messagebird.verify.create(newMobNumber, params,
-    //       (err, response) => {
-    //         if (err) {
-    //           // Could not send OTP e.g. Phone number Invalid
-    //           console.log("OTP Send Error:", err);
-    //           res.status(200).send({ "status": "failed", "message": "Unable to Send OTP" })
-    //         } else {
-    //           // OTP Send Success
-    //           console.log("OTP Send Response:", response);
-    //           res.status(200).send({ "status": "success", "message": "OTP Send Successfully", "id": response.id })
-    //         }
-    //       });
-    //   }
+            if (result) {
+                res.send({ message: "Your new mPin cannot be same as old!" });
+            } else {
+                const salt = await bcrypt.genSalt(parseInt(process.env.SALT));
+                const newmPin = await bcrypt.hash(req.body.mPin.toString(), salt);
+                await userModel.findOneAndUpdate(
+                    { mobNumber: req.user.mobNumber },
+                    { mPin: newmPin } 
+                );
+                res.send({"status" : "success", "message": "MPin changed successfully" });
+            }
+        } catch (error) {
+            res.json({ message: error });
+        }
+    };
 
-    
+
+    static addNewMPin = async (req,res)=>{
+        const newMPin = req.body.newMPin.toString()
+        if(newMPin.length!=4) return res.send("Enter a valid 4-digit new MPin")
+        try {
+            const salt = await bcrypt.genSalt(Number(process.env.SALT)); // salt generation
+            const hashedPassword = await bcrypt.hash(req.body.newMPin.toString(), salt) // bcrypting MPin
+            const docs = await userModel.findOneAndUpdate({ mobNumber: req.body.mobNumber},{ mPin: hashedPassword },(err)=>{ //Update in database
+                if(err) return res.send(err)
+            }).clone();
+            if(docs==null) return res.send("User is not registered")
+            return res.status(200).send("MPin successfully Updated")
+        } 
+        catch(err) {
+            return res.status(500).send(err)
+        }
+}
+
+
  
 
 

@@ -12,7 +12,7 @@ router.get('/:id',checkUserAuth, getSingleSite)
 router.put('/:id',checkUserAuth, updateSiteById)
 router.delete('/delete',checkUserAuth, deleteSite)
 router.get('/',checkUserAuth, searchSite)
-router.put('/reset',checkUserAuth, resetPassword)
+
 // router.get('/decryptpassword',checkUserAuth, decryptPassword)
 
 module.exports = router

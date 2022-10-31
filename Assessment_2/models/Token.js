@@ -16,6 +16,5 @@ const userTokenSchema = new Schema({
 		expires: 10 * 86400, // deletes itself in 30 days
 	}
 });
-
 const UserToken = mongoose.model("UserToken", userTokenSchema);
 module.exports =  UserToken;

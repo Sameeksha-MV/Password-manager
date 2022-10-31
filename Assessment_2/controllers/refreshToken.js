@@ -25,6 +25,7 @@ async function GetNewAccessToken(req, res) {
 };
 
 // logout
+
 async function logout(req, res) {
 	try {
 

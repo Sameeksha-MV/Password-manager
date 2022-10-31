@@ -23,8 +23,6 @@ var SiteController = class SiteController{
             notes : notes,
             mobNumber:req.user.mobNumber
         })
-        console.log("result")
-
         try{
             const result = await newSite.save()
             console.log(result)
@@ -41,7 +39,7 @@ var SiteController = class SiteController{
             const response = await siteModel.find({mobNumber:req.user.mobNumber})
             res.send(response)
         }catch(error){
-            console.log(error)
+            console.log({"status":"failed", "message": " Something went wrong"})
         }
     }
 
@@ -51,7 +49,7 @@ var SiteController = class SiteController{
             const response = await siteModel.find({$and :[ {_id:req.params.id},{mobNumber:req.user.mobNumber}]} )
             res.send(response)
         }catch(error){
-            res.send(error)
+            res.send({"status":"failed", "message": " Something went wrong"})
         } 
     }
 
@@ -70,29 +68,13 @@ var SiteController = class SiteController{
     static deleteSite = async(req,res)=>{   
         await siteModel.findOneAndDelete({$and:[{_id:req.body._id},{mobNumber:req.user.mobNumber}]},function (err,docs)/*callback*/ {
             if (err) return res.status(401).send(err)
-        if(docs==null) return res.status(401).send("Unauthorized access to the site") // if Id of other site is given
-        return res.send("Site deleted")}).clone()
+        if(docs==null) return res.status(401).send({"status" : "failed","message" : "Unauthorized access to the site"}) // if Id of other site is given
+        return res.send({"status" : "success","message" : "Site deleted"})}).clone()
     }
+    
 
     
     // To search the sites
-
-    // static searchSite = async (req, res)=>{
-    //     try {
-    //        const results = await siteModel.find({$and:[{
-    //         $or: [
-    //             {url:{$regex: req.body.text}},
-    //             {notes:{$regex: req.body.text}},
-    //             {sector:{$regex: req.body.text}},
-    //             {sitename:{$regex: req.body.text}},
-    //             {username:{$regex: req.body.text}}
-    //         ]
-    //     },{mobNumber:req.user.mobNumber}]}   )
-    //         res.send(results)
-    //     }catch(error){
-    //         res.status(400).send({ "status": "failed" , "message": "Failed to search"})
-    //     }
-    // }
 
     static searchSite = async (req, res) => {
         try {
@@ -100,48 +82,21 @@ var SiteController = class SiteController{
             var regex = new RegExp(search, "i"); //case insensitive
             await siteModel.find(
                 { mobNumber: req.user.mobNumber, $text: { $search: regex } },
-                (err, docs) => {
-                    if (docs) {
-                        res.status(200).send({ docs });
+                (err, result) => {
+                    if (result) {
+                        res.status(200).send({ result });
                     } else res.send(err);
                 }
             ).clone();
         } catch (err) {
-            return res.json({ message: err.message });
+            return res.status(400).send({ "status": "failed" , "message": "Failed to search"})
         }
     };
     
 
-    static resetPassword = async(req,res)=>{
-        try {
-            hashedPassword = await bcrypt.hash(req.body.mPin,10)
-            await User.findOneAndUpdate({
-                mobNumber: req.body.mobNumber
-            },{
-                mPin: hashedPassword
-                })
-                res.send({ "status": "success" , "message": "Reset password successful"})
-        } catch (error) {
-            res.send(error.message)
-            // console.log(error)
-        }
-    
-    }
     
 
-    // To copy the password 
-    // static decryptPassword = async (req, res)=>{
-
-    //     const {url} = req.body
-    //     try{
-    //         const response = await siteModel.find({url})
-    //         res.send(cryptr.decrypt(response[0].sitepassword))  // decrypts password
-            
-    //     }catch(error){
-    //         console.log(error)
-    //         res.send({ "status": "failed", "message": "Something went wrong" })
-    //     }
-    // }
+  
     }
 
 module.exports = SiteController

@@ -16,7 +16,7 @@ const siteSchema = new mongoose.Schema({
     },
     sector:{
         type : String,
-        // enum:["Social Media", "Payment ", "Entertainment", ],
+        // enum:["Social Media", "Payment ", "Entertainment", ]
         required : true
     },
     username:{
